@@ -18,7 +18,7 @@ def connect():
     PSQL_PORT = "5432"
     PSQL_USER = "root"
     PSQL_PASS = "root"
-    PSQL_DB = "root"
+    PSQL_DB = "config_DB"
 
     try:
         # Connection
