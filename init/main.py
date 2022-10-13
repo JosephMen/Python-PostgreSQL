@@ -27,9 +27,10 @@ def connect():
         """ % (PSQL_HOST, PSQL_PORT, PSQL_USER, PSQL_PASS, PSQL_DB)
         connection = psycopg2.connect(connection_address)
         cursor01 = connection.cursor()
-        #create_table(cursor01)
-        # insert(cursor01)
-        # insert(cursor01)
+        create_table(cursor01)
+        create_trigger(cursor01)
+        insert(cursor01)
+        insert(cursor01)
         # delete(cursor01, 1)
         update(cursor01,customer_id=13, first_name="Joseph")
         connection.commit()
@@ -44,7 +45,7 @@ def connect():
 
 def insert(cursor):
     command = """
-        insert into customer2(first_name) values('frander')
+        insert into customer2(first_name) values('frander');
     """
     cursor.execute(command)
     print("insertion succesfull")
@@ -52,7 +53,7 @@ def insert(cursor):
 def delete(cursor, id=1):
     command = """
         delete from customer2 
-        where customer_id = '%s'
+        where customer_id = '%s';
     """ % (id)
     cursor.execute(command)
     print("Deleted succesfull")
@@ -64,7 +65,7 @@ def update(cursor, customer_id=1, first_name="", last_name="", address_id="",ema
             last_name='%s', 
             address_id='%s', 
             email='%s'
-        where customer_id='%s'
+        where customer_id='%s';
     """ % (first_name, last_name, address_id, email, customer_id)
     cursor.execute(command)
     print("Updated succesfull")
@@ -80,13 +81,30 @@ def create_table(cursor):
             active BOOLEAN DEFAULT TRUE,
             create_date DATE DEFAULT CURRENT_DATE,
             update_date TIMESTAMP DEFAULT now()
-        )
+        );
     """
     cursor.execute(command)
     print("table created!")
 
 def create_trigger(cursor):
 
+    command = """
+        create or replace function update_customer2() returns Trigger 
+        as
+        $$
+        begin 
+        new.update_date := now();
+        return new;
+        end
+        $$
+        language plpgsql;
+
+        create trigger update_trigger_customer 
+            after update on customer2
+            for each row
+            execute procedure update_customer2();
+    """
+    cursor.execute(command)
     print("Trigger created !")
 
 
