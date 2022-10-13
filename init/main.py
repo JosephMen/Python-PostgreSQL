@@ -27,10 +27,13 @@ def connect():
         """ % (PSQL_HOST, PSQL_PORT, PSQL_USER, PSQL_PASS, PSQL_DB)
         connection = psycopg2.connect(connection_address)
         cursor01 = connection.cursor()
+
         create_table(cursor01)
+        create_configuration_table(cursor01)
         create_trigger(cursor01)
         insert(cursor01)
         insert(cursor01)
+
         # delete(cursor01, 1)
         update(cursor01,customer_id=13, first_name="Joseph")
         connection.commit()
@@ -86,6 +89,21 @@ def create_table(cursor):
     cursor.execute(command)
     print("table created!")
 
+def create_configuration_table(cursor):
+    command = """
+        CREATE TABLE if not exists ConfigurationTable(
+            client_id INTEGER,
+            client_url TEXT,
+            metric BOOLEAN DEFAULT FALSE,
+            planning BOOLEAN DEFAULT FALSE,
+            clustering BOOLEAN DEFAULT FALSE,
+            valve_critically BOOLEAN DEFAULT FALSE,
+            FOREIGN KEY (client_id) 
+                REFERENCES customer2(customer_id)
+        );
+    """
+    cursor.execute(command)
+    print("Configuration table created succesfull")
 def create_trigger(cursor):
 
     command = """
